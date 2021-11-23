@@ -53,12 +53,9 @@ public class WebServer {
         String url = null;
         String str = ".";
         String bodyResponse = "";
-        while (str != null && !str.equals("")){
-          str = in.readLine();
-          if(str == null) continue;
-          // Only look for GET now
-        try {
-          Request request = new Request(str);
+
+
+          HttpRequest request = HttpRequest.readHttpRequest(in);
           switch (request.method) {
             case GET: {
               // Handle get
@@ -77,10 +74,8 @@ public class WebServer {
             default:
               // Bad request
           }
-        } catch(Exception e) {
 
-        }
-        }
+
 
         // Send the response
         // Send the headers
