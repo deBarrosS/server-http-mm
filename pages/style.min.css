@@ -1,0 +1,11 @@
+#css-test{
+    border : 1px solid black;
+    background-color: brown;
+    color : white;
+    margin : auto;
+}
+#css-test:hover{
+    background-color: darkgray;
+    animation: alternate;
+    animation-duration: .5s;
+}

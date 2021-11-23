@@ -240,7 +240,7 @@ public class WebServer {
       case (".js")->{
         contentType = "text/script";
       }
-      case (".png")->{
+      case (".png"), (".ico") ->{
         contentType = "image/png";
       }
       case (".jpeg") ->{
