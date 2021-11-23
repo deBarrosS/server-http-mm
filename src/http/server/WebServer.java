@@ -31,6 +31,7 @@ public class WebServer {
    */
   protected void start() {
     ServerSocket s;
+    Service service = new Service();
 
     System.out.println("Webserver starting up on port 3000");
     System.out.println("(press ctrl-c to exit)");
@@ -79,6 +80,30 @@ public class WebServer {
           }
           // Bad request
         }
+        String url = null;
+        String str = ".";
+        String bodyResponse = "";
+
+
+          HttpRequest request = HttpRequest.readHttpRequest(in);
+          switch (request.method) {
+            case GET: {
+              // Handle get
+              System.out.println("Parameters:" + request.params);
+              bodyResponse = getHTMLFile(request.params);
+              break;
+            }
+            case POST: {
+              bodyResponse = service.handleAddTodoItem(request.body);
+              break;
+            }
+            case DELETE: {
+              // Handle delete
+              break;
+            }
+            default:
+              // Bad request
+          }
 
 
 
@@ -112,14 +137,10 @@ public class WebServer {
   private HttpResponse getFile(String filename){
 
     StringBuilder stringBuilder = new StringBuilder();
-
-    String httpVersion = "HTTP/1.1";
-    String statusCode = "200 OK" ;
-    String headers = "Content-Type: text/html";
     String html = "";
     try{
-
-      BufferedInputStream fileStream = new BufferedInputStream(new FileInputStream());
+      FileReader fileReader = new FileReader("src/pages/todo.html");
+      BufferedReader bufferedReader = new BufferedReader(fileReader);
       String line = bufferedReader.readLine() ;
 
       while(line !=null){
@@ -130,17 +151,15 @@ public class WebServer {
       bufferedReader.close();
     }catch(FileNotFoundException e){
       System.out.println("File Not Found, POST a 404: "+e);
-      statusCode = "404 Not Found";
       html = "";
     } catch (IOException e) {
       e.printStackTrace();
       html = "";
     }
-    String statusLine = httpVersion + " " +statusCode;
     html = stringBuilder.toString();
-    HttpResponse repsonse = new HttpResponse(statusLine,headers,html);
-
-    return repsonse;
+    System.out.println("> html");;
+    System.out.println(html);
+    return html;
   }
 
  */
@@ -196,79 +215,7 @@ public class WebServer {
       System.err.println("Error in Fetch File " + e);
     }
 
-    return file;
-  }
-
-  private String treatFilename(String filename){
-    String treated = filename.substring(1);
-    if (treated.endsWith("/")) {
-      treated += INDEX;
-    } else if (!treated.contains(".")) treated += "/" + INDEX;
-    return treated;
-  }
-
-  public int handleHead(BufferedOutputStream out, String filename) {
-    filename = treatFilename(filename);
-
-    boolean accessPermited = filename.startsWith(FILES_DIRECTORY);
-    if(!accessPermited){
-
-      return 403;
-    }
-    System.out.println("accessPermited " + accessPermited);
-    // Header still to receive status, length of the body and other headers
-    try{
-      // The returned file is never used is not used
-      File file = fetchFile(filename, out);
-      if(file.exists() && file.isFile()) return 200;
-    }catch(Exception e){
-      System.err.println("Error in handleHead " + e);
-    }
-
-    return 404;
-  }
-
-  public String responseHeader(String status, String extension, long fileLength){
-    String rn = "\r\n";
-    StringBuilder headerBuilder = new StringBuilder();
-    headerBuilder.append("HTTP/1.1 ");
-    headerBuilder.append(status);
-    headerBuilder.append(rn);
-
-    String contentType = "text/html";
-    switch(extension){
-      case (".js")->{
-        contentType = "text/script";
-      }
-      case (".png"), (".ico") ->{
-        contentType = "image/png";
-      }
-      case (".jpeg") ->{
-        contentType = "image/jpg";
-      }
-      case (".css") ->{
-        contentType = "text/css";
-      }
-      default -> {
-        System.out.println("default case");
-      }
-    }
-    headerBuilder.append("Content-Type:");
-    headerBuilder.append(contentType);
-    headerBuilder.append(rn);
-
-    headerBuilder.append("Content-Length:");
-    headerBuilder.append(fileLength);
-    headerBuilder.append(rn);
-
-    headerBuilder.append("Server: Bot");
-    headerBuilder.append(rn);
-    headerBuilder.append(rn);
-
-    return headerBuilder.toString();
-
-  }
-    /**
+  /**
    * Start the application.
    * 
    * @param args

@@ -2,11 +2,16 @@ package http.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import static http.server.HttpMethods.POST;
 
 public class HttpRequest {
     public HttpMethods method;
     public String params;
-
+    public Map<String, String> body;
     HttpRequest(String s){
         String[] strSplit = s.split(" ");
         String methodString = strSplit[0];
@@ -32,6 +37,20 @@ public class HttpRequest {
                     }
                 } catch (Exception e) {
                     System.err.println("Error in HttpRequest: "+ e);
+                }
+            }
+            if (request.method == POST) {
+                str = in.readLine();
+                //  load body
+                request.body = new HashMap<>();
+                while (str != null && !str.equals("")) {
+                    String[] strSplit = str.split("=");
+                    if(strSplit.length > 1){
+                        request.body.put(strSplit[0], strSplit[1]);
+                    } else {
+                        request.body.put(strSplit[0], "");
+                    }
+                    str = in.readLine();
                 }
             }
         } catch (IOException e){
