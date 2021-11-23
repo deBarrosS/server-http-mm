@@ -6,6 +6,7 @@ import java.io.IOException;
 public class HttpRequest {
     public HttpMethods method;
     public String params;
+
     HttpRequest(String s){
         String[] strSplit = s.split(" ");
         String methodString = strSplit[0];
