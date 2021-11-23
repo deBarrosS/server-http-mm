@@ -54,7 +54,7 @@ public class WebServer {
         while (str != null && !str.equals("")){
           str = in.readLine();
 
-          // ON s'en bat les couilles des headers pour le moment, la seule chose qui importe est le GET
+          // Only look for GET now
           if(str !=  null){
             String[] strSplit = str.split(" ");
             if(strSplit[0].equals("GET")) url = strSplit[1];
@@ -89,7 +89,7 @@ public class WebServer {
     StringBuilder stringBuilder = new StringBuilder();
     String html = "";
     try{
-      FileReader fileReader = new FileReader(url);
+      FileReader fileReader = new FileReader("src/pages/index.html");
       BufferedReader bufferedReader = new BufferedReader(fileReader);
       String line = bufferedReader.readLine() ;
 
@@ -100,7 +100,7 @@ public class WebServer {
 
       bufferedReader.close();
     }catch(FileNotFoundException e){
-      System.out.println("File Not Found, POST a 404");
+      System.out.println("File Not Found, POST a 404: "+e);
       html = "";
     } catch (IOException e) {
       e.printStackTrace();
