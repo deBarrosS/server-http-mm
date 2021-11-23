@@ -24,6 +24,7 @@ public class WebServer {
    */
   protected void start() {
     ServerSocket s;
+    Service service = new Service();
 
     System.out.println("Webserver starting up on port 3000");
     System.out.println("(press ctrl-c to exit)");
@@ -64,7 +65,7 @@ public class WebServer {
               break;
             }
             case POST: {
-              // Handle post
+              bodyResponse = service.handleAddTodoItem(request.body);
               break;
             }
             case DELETE: {
@@ -100,7 +101,7 @@ public class WebServer {
     StringBuilder stringBuilder = new StringBuilder();
     String html = "";
     try{
-      FileReader fileReader = new FileReader("src/pages/index.html");
+      FileReader fileReader = new FileReader("src/pages/todo.html");
       BufferedReader bufferedReader = new BufferedReader(fileReader);
       String line = bufferedReader.readLine() ;
 
