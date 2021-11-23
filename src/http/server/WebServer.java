@@ -18,6 +18,7 @@ import java.net.Socket;
  */
 public class WebServer {
 
+
   /**
    * WebServer constructor.
    */
@@ -51,20 +52,30 @@ public class WebServer {
         // headers.
         String url = null;
         String str = ".";
-        while (str != null && !str.equals("")){
-          str = in.readLine();
-
-          // Only look for GET now
-          if(str !=  null){
-            String[] strSplit = str.split(" ");
-            if(strSplit[0].equals("GET")) url = strSplit[1];
-          }
-        }
         String bodyResponse = "";
-        if(url!=null){
-          System.out.println("URL:" + url);
-          bodyResponse = getHTMLFile(url);
-        }
+
+
+          HttpRequest request = HttpRequest.readHttpRequest(in);
+          switch (request.method) {
+            case GET: {
+              // Handle get
+              System.out.println("Parameters:" + request.params);
+              bodyResponse = getHTMLFile(request.params);
+              break;
+            }
+            case POST: {
+              // Handle post
+              break;
+            }
+            case DELETE: {
+              // Handle delete
+              break;
+            }
+            default:
+              // Bad request
+          }
+
+
 
         // Send the response
         // Send the headers
@@ -76,7 +87,7 @@ public class WebServer {
 
         // Send the HTML page
         out.println(bodyResponse);
-
+        bodyResponse = "";
         out.flush();
         remote.close();
       } catch (Exception e) {
