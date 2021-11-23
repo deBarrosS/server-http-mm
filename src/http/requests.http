@@ -2,11 +2,11 @@ GET http://localhost:3000/
 Accept: text/html
 
 ###
-POST http://localhost:3000/add
+POST http://localhost:3000/
 Content-Type: application/json
 
 {
-  "content": "Hello good sir"
+  "new-item": "Hello good sir"
 }
 
 ###

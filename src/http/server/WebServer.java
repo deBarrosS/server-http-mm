@@ -59,13 +59,22 @@ public class WebServer {
           HttpRequest request = HttpRequest.readHttpRequest(in);
           switch (request.method) {
             case GET: {
-              // Handle get
               System.out.println("Parameters:" + request.params);
-              bodyResponse = getHTMLFile(request.params);
+              switch (request.params) {
+                case("/"):
+                bodyResponse = getHTMLFile("todo.html");
+                break;
+                default:
+                  // 404
+                  bodyResponse = getHTMLFile("404.html");
+                  break;
+              }
+              // Handle get
               break;
             }
             case POST: {
-              bodyResponse = service.handleAddTodoItem(request.body);
+              bodyResponse = getHTMLFile("404.html");
+//              bodyResponse = service.handleAddTodoItem(request.body);
               break;
             }
             case DELETE: {
@@ -101,7 +110,7 @@ public class WebServer {
     StringBuilder stringBuilder = new StringBuilder();
     String html = "";
     try{
-      FileReader fileReader = new FileReader("src/pages/todo.html");
+      FileReader fileReader = new FileReader("src/pages/"+url);
       BufferedReader bufferedReader = new BufferedReader(fileReader);
       String line = bufferedReader.readLine() ;
 
