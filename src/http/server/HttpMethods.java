@@ -7,6 +7,7 @@ public enum HttpMethods {
     GET,
     POST,
     DELETE,
+    HEAD,
     UNKNOWN;
 
     public static HttpMethods getRequestMethod(String str) {
@@ -16,6 +17,8 @@ public enum HttpMethods {
             return POST;
         } else if(DELETE.toString().equals(str)){
             return DELETE;
+        }else if(HEAD.toString().equals(str)){
+            return HEAD;
         }
         return UNKNOWN;
     }
