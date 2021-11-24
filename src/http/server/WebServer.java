@@ -73,8 +73,7 @@ public class WebServer {
               break;
             }
             case POST: {
-              bodyResponse = getHTMLFile("404.html");
-//              bodyResponse = service.handleAddTodoItem(request.body);
+              bodyResponse = service.handleAddTodoItem(request.body);
               break;
             }
             case DELETE: {
