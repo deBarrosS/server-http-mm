@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static http.server.HttpMethods.POST;
 
@@ -14,7 +12,6 @@ public class HttpRequest {
     public HttpMethods method;
     public String params;
     public Map<String, String> body;
-    private static int INPUT_BUFFER_LENGTH = 1000;
     HttpRequest(String s){
         String[] strSplit = s.split(" ");
         String methodString = strSplit[0];
@@ -26,19 +23,14 @@ public class HttpRequest {
 
     }
 
-
     public static HttpRequest readHttpRequest(BufferedReader in){
+        String str = ".";
         HttpRequest request = null;
         try {
-            char[] inputBuffer = new char[INPUT_BUFFER_LENGTH];
-
-            in.read(inputBuffer, 0,
-                    INPUT_BUFFER_LENGTH);
-            String requestStr = new String(inputBuffer);
-            String lines[] = requestStr.split("\\u0000?\\r?\\n");
-            int index = 0;
-            String str = lines[index++];
             while (str != null && !str.equals("")) {
+                str = in.readLine();
+                if (str == null) continue;
+                // Only look for GET now
                 try {
                     if (request == null) {
                         request = new HttpRequest(str);
@@ -46,13 +38,9 @@ public class HttpRequest {
                 } catch (Exception e) {
                     System.err.println("Error in HttpRequest: "+ e);
                 }
-                str = lines[index++];
             }
-
-
-            // Get request body
             if (request.method == POST) {
-                str = lines[index++];
+                str = in.readLine();
                 //  load body
                 request.body = new HashMap<>();
                 while (str != null && !str.equals("")) {
@@ -62,17 +50,12 @@ public class HttpRequest {
                     } else {
                         request.body.put(strSplit[0], "");
                     }
-                    if (!indexInBounds(index, lines))break;
-                    str = lines[index++];
+                    str = in.readLine();
                 }
             }
         } catch (IOException e){
             System.err.println("Error parsing request in HttpRequest: "+ e);
         }
         return request;
-    }
-
-    private static boolean indexInBounds(int index, String[] lines) {
-        return index < lines.length;
     }
 }

@@ -88,17 +88,9 @@ public class WebServer {
           HttpRequest request = HttpRequest.readHttpRequest(in);
           switch (request.method) {
             case GET: {
-              System.out.println("Parameters:" + request.params);
-              switch (request.params) {
-                case("/"):
-                bodyResponse = getHTMLFile("todo.html");
-                break;
-                default:
-                  // 404
-                  bodyResponse = getHTMLFile("404.html");
-                  break;
-              }
               // Handle get
+              System.out.println("Parameters:" + request.params);
+              bodyResponse = getHTMLFile(request.params);
               break;
             }
             case POST: {
@@ -147,7 +139,7 @@ public class WebServer {
     StringBuilder stringBuilder = new StringBuilder();
     String html = "";
     try{
-      FileReader fileReader = new FileReader("src/pages/"+url);
+      FileReader fileReader = new FileReader("src/pages/todo.html");
       BufferedReader bufferedReader = new BufferedReader(fileReader);
       String line = bufferedReader.readLine() ;
 

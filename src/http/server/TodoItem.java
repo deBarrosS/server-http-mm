@@ -6,7 +6,7 @@ public class TodoItem {
 
     public TodoItem(int id, String content) {
         this.id = id;
-        this.content = content.replaceAll("\\+", " ");
+        this.content = content;
     }
 
     public int getId() {
@@ -26,7 +26,6 @@ public class TodoItem {
     }
 
     public String toHTMLCode(){
-        String element = "<p>"+ this.content+"</p>";
-        return element;
+        return "<p>"+ this.content+"</p>";
     }
 }

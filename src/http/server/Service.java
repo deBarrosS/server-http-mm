@@ -35,7 +35,7 @@ public class Service {
 
             while(line !=null){
 //                detect the section where we must insert the todo items
-                if ("<!--ITEMS-->".equals(line)){
+                if ("<!--    ITEMS-->".equals(line)){
                     for (TodoItem todoItem:todoItemList) {
                         stringBuilder.append(todoItem.toHTMLCode());
                     }
