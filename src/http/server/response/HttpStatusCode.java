@@ -31,11 +31,11 @@ public enum HttpStatusCode {
      */
     NOT_FOUND(404, "Not Found"),
     /**
-     * 405 Method Not Allowed
-     * The request method is known by the server but is not supported by the target resource. For
-     * example, an API may not allow calling PATCH to patch a resource.
+     * 500 Internal Server Error
+     * The server has encountered a situation it does not know how to handle.
      */
-    METHOD_NOT_ALLOWED(405, "OK");
+    INTERNAL_SERVER_ERROR(500, "Internal Server Error");
+
 
     private int statusCode;
     private String statusName;
