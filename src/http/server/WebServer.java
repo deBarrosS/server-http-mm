@@ -64,7 +64,6 @@ public class WebServer {
         // headers.
         HttpRequest request = HttpRequest.readHttpRequest(in);
         HttpResponse response;
-        int status = 0;
         String url = null;
         String str = ".";
 
@@ -74,15 +73,7 @@ public class WebServer {
                   System.out.println("Parameters:" + request.params);
                   // Handle get
                 System.out.println("Parameters:" + request.params);
-                status = handleGet(out, request.params);
-                System.out.println("Status : " + status);
-                break;
-              }
-              // if ("/".equals(request.params)) {
-              //   response = new HttpResponse(HttpStatusCode.OK, Service.getHTMLFile("todo.html"));
-              // } else {// 404
-              //   response = new HttpResponse(HttpStatusCode.NOT_FOUND, Service.getHTMLFile("404.html"));
-              // }
+                response = service.handleGet(request.params);
               break;
             }
             case POST: {
@@ -110,7 +101,7 @@ public class WebServer {
               break;
             }
             case HEAD : {
-              status = handleHead(out, request.params);
+              response = HttpResponse.badRequestResponse();// handleHead(out, request.params);
               break;
             }
             default:
@@ -118,6 +109,7 @@ public class WebServer {
               response = HttpResponse.badRequestResponse();
               break;
           }
+
         response.sendResponse(out);
         remote.close();
       } catch (Exception e) {

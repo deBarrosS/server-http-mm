@@ -2,6 +2,7 @@ package http.server.response;
 
 import http.server.Service;
 
+import java.io.BufferedOutputStream;
 import java.io.PrintWriter;
 
 /**
@@ -23,7 +24,7 @@ public class HttpResponse {
       * but not flush it.
       * @param out the PrintWriter used to send the body
      */
-    public void sendHeader(PrintWriter out){
+    public void sendHeader(BufferedOutputStream out){
         // Send the headers
         out.println("HTTP/1.0 " + this.statusCode);
         out.println("Content-Type: " + contentType);
@@ -37,7 +38,7 @@ public class HttpResponse {
      * but not flush it.
      * @param out the PrintWriter used to send the body
      */
-    public void sendBody(PrintWriter out){
+    public void sendBody(BufferedOutputStream out){
         // Send the HTML page or JSON File
         out.println(this.body);
     }
@@ -47,7 +48,7 @@ public class HttpResponse {
      * Please be awater that it will flush the PrintWriter
      * @param out he PrintWriter used to send the response
      */
-    public void sendResponse(PrintWriter out){
+    public void sendResponse(BufferedOutputStream out){
         sendHeader(out);
         if (body != null) {
             sendBody(out);

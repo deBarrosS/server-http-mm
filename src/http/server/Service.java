@@ -1,11 +1,10 @@
 package http.server;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class Service {
@@ -58,6 +57,36 @@ public class Service {
         return html;
     }
 
+    public int handleGet(BufferedOutputStream out, String filename){
+//        filename = treatFilename(filename);
+
+//        String extension = filename.substring(filename.lastIndexOf('.')).toLowerCase(Locale.ROOT);
+
+        try{
+
+            File file = getFile(filename);
+
+            // Read the file as binary allows same manipulation for every type of file
+            // At this point all the headers have been sent
+            // Send the body of the response; The bodies here treated are "Single-resource bodies"
+            BufferedInputStream fileStream = new BufferedInputStream(new FileInputStream(file));
+            byte[] fileBuffer = new byte[256];
+            int contentLength;
+            while((contentLength = fileStream.read(fileBuffer)) != -1) {
+                out.write(fileBuffer, 0,contentLength );
+            }
+
+            fileStream.close();
+            out.flush();
+        }catch(Exception e){
+            System.err.println("Error in Handle Get " + e);
+        }
+
+        return Integer.parseInt(status.split(" ")[0]);
+    }
+
+
+
     public static String getHTMLFile(String fileName){
         StringBuilder stringBuilder = new StringBuilder();
         String html = "";
@@ -73,7 +102,7 @@ public class Service {
 
             bufferedReader.close();
         }catch(FileNotFoundException e){
-            System.out.println("File Not Found, POST a 404: "+e);
+            System.out.println("File Not Found, POST a 404: " + e);
             html = "";
         } catch (IOException e) {
             e.printStackTrace();
