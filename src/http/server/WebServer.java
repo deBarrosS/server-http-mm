@@ -2,6 +2,10 @@
 
 package http.server;
 
+import http.server.requests.HttpRequest;
+import http.server.response.HttpResponse;
+import http.server.response.HttpStatusCode;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -59,44 +63,62 @@ public class WebServer {
         // blank line signals the end of the client HTTP
         // headers.
         HttpRequest request = HttpRequest.readHttpRequest(in);
+        HttpResponse response;
         int status = 0;
-        switch (request.method) {
-          case GET -> {
-            // Handle get
-            System.out.println("Parameters:" + request.params);
-            status = handleGet(out, request.params);
-            System.out.println("Status : " + status);
-          }
-          case POST -> {
-            // handle Post
-          }
-          case DELETE -> {
-            // Handle delete
-          }
-          case HEAD -> {
-            status = handleHead(out, request.params);
-          }
-          default -> {
-          }
-          // Bad request
-        }
+        String url = null;
+        String str = ".";
 
-
-
-        // Send the response
-        //  out.println("HTTP/1.0 200 OK");
-        // Send the headers
-        /*
-        out.println("Content-Type: text/html");
-        out.println("Server: Bot");
-        */
-        // this blank line signals the end of the headers
-        //out.println("");
-
-        // Send the HTML page
-        // out.println(bodyResponse);
-        //bodyResponse = "";
-        out.flush();
+          switch (request.method) {
+            case GET: {
+              // Handle get
+                  System.out.println("Parameters:" + request.params);
+                  // Handle get
+                System.out.println("Parameters:" + request.params);
+                status = handleGet(out, request.params);
+                System.out.println("Status : " + status);
+                break;
+              }
+              // if ("/".equals(request.params)) {
+              //   response = new HttpResponse(HttpStatusCode.OK, Service.getHTMLFile("todo.html"));
+              // } else {// 404
+              //   response = new HttpResponse(HttpStatusCode.NOT_FOUND, Service.getHTMLFile("404.html"));
+              // }
+              break;
+            }
+            case POST: {
+              response = new HttpResponse(HttpStatusCode.CREATED, service.handleAddTodoItem(request.body));
+              break;
+            }
+            case DELETE: {
+              // Handle delete
+              if ("/".equals(request.params)) {
+                // no file is provided, bad request
+                response = HttpResponse.badRequestResponse();
+              } else {
+                response = new HttpResponse(HttpStatusCode.OK, service.handleDeleteFile(request.params));
+              }
+              break;
+            }
+            case PUT: {
+              // Handle delete
+              if ("/".equals(request.params)) {
+                // no file is provided, bad request
+                response = HttpResponse.badRequestResponse();
+              } else {
+                response = new HttpResponse(HttpStatusCode.CREATED, service.handlePutFile(request.params));
+              }
+              break;
+            }
+            case HEAD : {
+              status = handleHead(out, request.params);
+              break;
+            }
+            default:
+              // Bad request
+              response = HttpResponse.badRequestResponse();
+              break;
+          }
+        response.sendResponse(out);
         remote.close();
       } catch (Exception e) {
         System.out.println("Error: " + e);

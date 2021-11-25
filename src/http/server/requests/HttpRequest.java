@@ -1,4 +1,4 @@
-package http.server;
+package http.server.requests;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import static http.server.HttpMethods.POST;
+import static http.server.requests.HttpMethods.POST;
 
 public class HttpRequest {
     public HttpMethods method;

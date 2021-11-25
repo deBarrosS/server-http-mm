@@ -58,11 +58,11 @@ public class Service {
         return html;
     }
 
-    public static String getHTMLFile(String url){
+    public static String getHTMLFile(String fileName){
         StringBuilder stringBuilder = new StringBuilder();
         String html = "";
         try{
-            FileReader fileReader = new FileReader("src/pages/todo.html");
+            FileReader fileReader = new FileReader("src/pages/"+ fileName);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine() ;
 
@@ -85,4 +85,10 @@ public class Service {
         return html;
     }
 
+    public String handleDeleteFile(String param) {
+        return getHTMLFile("delete_success.html");
+    }
+    public String handlePutFile(String param) {
+        return getHTMLFile("put_success.html");
+    }
 }

@@ -1,4 +1,4 @@
-package http.server;
+package http.server.requests;
 
 /**
  * HttpMethods lists all http methods supported by this server
@@ -8,6 +8,7 @@ public enum HttpMethods {
     POST,
     DELETE,
     HEAD,
+    PUT,
     UNKNOWN;
 
     public static HttpMethods getRequestMethod(String str) {
