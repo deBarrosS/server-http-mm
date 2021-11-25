@@ -57,6 +57,7 @@ public class WebServer {
 
         BufferedReader in = new BufferedReader(new InputStreamReader( remote.getInputStream()));
         BufferedOutputStream out = new BufferedOutputStream(remote.getOutputStream());
+        PrintWriter oldOut = new PrintWriter(remote.getOutputStream());
 
         // read the data sent. We basically ignore it,
         // stop reading once a blank line is hit. This
@@ -66,51 +67,53 @@ public class WebServer {
         HttpResponse response;
         String url = null;
         String str = ".";
-
-          switch (request.method) {
-            case GET: {
-              // Handle get
-                  System.out.println("Parameters:" + request.params);
-                  // Handle get
-                System.out.println("Parameters:" + request.params);
-                response = service.handleGet(request.params);
-              break;
-            }
-            case POST: {
-              response = new HttpResponse(HttpStatusCode.CREATED, service.handleAddTodoItem(request.body));
-              break;
-            }
-            case DELETE: {
-              // Handle delete
-              if ("/".equals(request.params)) {
-                // no file is provided, bad request
-                response = HttpResponse.badRequestResponse();
-              } else {
-                response = new HttpResponse(HttpStatusCode.OK, service.handleDeleteFile(request.params));
-              }
-              break;
-            }
-            case PUT: {
-              // Handle delete
-              if ("/".equals(request.params)) {
-                // no file is provided, bad request
-                response = HttpResponse.badRequestResponse();
-              } else {
-                response = new HttpResponse(HttpStatusCode.CREATED, service.handlePutFile(request.params));
-              }
-              break;
-            }
-            case HEAD : {
-              response = HttpResponse.badRequestResponse();// handleHead(out, request.params);
-              break;
-            }
-            default:
-              // Bad request
-              response = HttpResponse.badRequestResponse();
-              break;
+      int status = 0;
+        switch (request.method) {
+          case GET -> {
+            // Handle get
+            System.out.println("Parameters:" + request.params);
+            status = handleGet(out, request.params);
+            System.out.println("Status : " + status);
           }
+          case POST -> {
+            response = service.handleAddTodoItem(request.body);
+            response.sendResponse(oldOut);
+          }
+          case DELETE -> {
+            // TODO add file upload support
+            // Handle delete
+            if ("/".equals(request.params)) {
+              // no file is provided, bad request
+              response = HttpResponse.badRequestResponse();
+            } else {
+              response = new HttpResponse(HttpStatusCode.OK, service.handleDeleteFile(request.params));
+              response.sendResponse(oldOut);
 
-        response.sendResponse(out);
+            }
+          }
+          case PUT -> {
+            // TODO add file upload support
+            // Handle delete
+            if ("/".equals(request.params)) {
+              // no file is provided, bad request
+              response = HttpResponse.badRequestResponse();
+            } else {
+              response = new HttpResponse(HttpStatusCode.CREATED, service.handlePutFile(request.params));
+              response.sendResponse(oldOut);
+            }
+          }
+          case HEAD -> {
+            // TODO needs to be implemented
+            response = HttpResponse.badRequestResponse();// handleHead(out, request.params);
+            response.sendResponse(oldOut);
+          }
+          default -> {
+            // Bad request
+            response = HttpResponse.badRequestResponse();
+            response.sendResponse(oldOut);
+          }
+        }
+
         remote.close();
       } catch (Exception e) {
         System.out.println("Error: " + e);

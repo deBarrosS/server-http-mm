@@ -1,5 +1,8 @@
 package http.server;
 
+import http.server.response.HttpResponse;
+import http.server.response.HttpStatusCode;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
@@ -13,11 +16,14 @@ public class Service {
     private final String NEW_ITEM_KEY = "new-item";
 
 
-    public String handleAddTodoItem(Map<String, String> body) {
+    public HttpResponse handleAddTodoItem(Map<String, String> body) {
         TodoItem newItem = new TodoItem(latestId++, body.get(NEW_ITEM_KEY));
         todoItemList.add(newItem);
-
-        return generateTodoHTML();
+        String html =generateTodoHTML();
+        if (html == null){
+            return HttpResponse.internalServerErrorResponse();
+        }
+        return new HttpResponse(HttpStatusCode.CREATED, html);
     }
 
     /**
@@ -34,7 +40,7 @@ public class Service {
 
             while(line !=null){
 //                detect the section where we must insert the todo items
-                if ("<!--    ITEMS-->".equals(line)){
+                if ("<!--ITEMS-->".equals(line)){
                     for (TodoItem todoItem:todoItemList) {
                         stringBuilder.append(todoItem.toHTMLCode());
                     }
@@ -48,43 +54,15 @@ public class Service {
         }catch(FileNotFoundException e){
             // return 500
             System.err.println("Couldn't find load the core HTML file todo.html: "+e);
+            return null;
         } catch (IOException e) {
             // return 500
             System.err.println("Couldn't generate HTML file: "+e);
-            html = "";
+            return null;
         }
         html = stringBuilder.toString();
         return html;
     }
-
-    public int handleGet(BufferedOutputStream out, String filename){
-//        filename = treatFilename(filename);
-
-//        String extension = filename.substring(filename.lastIndexOf('.')).toLowerCase(Locale.ROOT);
-
-        try{
-
-            File file = getFile(filename);
-
-            // Read the file as binary allows same manipulation for every type of file
-            // At this point all the headers have been sent
-            // Send the body of the response; The bodies here treated are "Single-resource bodies"
-            BufferedInputStream fileStream = new BufferedInputStream(new FileInputStream(file));
-            byte[] fileBuffer = new byte[256];
-            int contentLength;
-            while((contentLength = fileStream.read(fileBuffer)) != -1) {
-                out.write(fileBuffer, 0,contentLength );
-            }
-
-            fileStream.close();
-            out.flush();
-        }catch(Exception e){
-            System.err.println("Error in Handle Get " + e);
-        }
-
-        return Integer.parseInt(status.split(" ")[0]);
-    }
-
 
 
     public static String getHTMLFile(String fileName){
