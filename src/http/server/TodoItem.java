@@ -6,7 +6,7 @@ public class TodoItem {
 
     public TodoItem(int id, String content) {
         this.id = id;
-        this.content = content;
+        setContent(content);
     }
 
     public int getId() {
@@ -22,7 +22,7 @@ public class TodoItem {
     }
 
     public void setContent(String content) {
-        this.content = content;
+        this.content = content.replaceAll("\\+", " ");
     }
 
     public String toHTMLCode(){

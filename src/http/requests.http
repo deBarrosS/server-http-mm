@@ -6,7 +6,13 @@ POST http://localhost:3000/add
 Content-Type: application/json
 
 {
-  "content": "Hello good sir"
+  "new-item": "Hello good sir"
 }
 
 ###
+DELETE http://localhost:3000/myfile.txt
+Accept: text/html
+
+###
+PUT http://localhost:3000/myfile.txt
+Accept: text/html

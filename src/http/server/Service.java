@@ -1,11 +1,13 @@
 package http.server;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import http.server.response.HttpResponse;
+import http.server.response.HttpStatusCode;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class Service {
@@ -14,11 +16,14 @@ public class Service {
     private final String NEW_ITEM_KEY = "new-item";
 
 
-    public String handleAddTodoItem(Map<String, String> body) {
+    public HttpResponse handleAddTodoItem(Map<String, String> body) {
         TodoItem newItem = new TodoItem(latestId++, body.get(NEW_ITEM_KEY));
         todoItemList.add(newItem);
-
-        return generateTodoHTML();
+        String html =generateTodoHTML();
+        if (html == null){
+            return HttpResponse.internalServerErrorResponse();
+        }
+        return new HttpResponse(HttpStatusCode.CREATED, html);
     }
 
     /**
@@ -35,7 +40,7 @@ public class Service {
 
             while(line !=null){
 //                detect the section where we must insert the todo items
-                if ("<!--    ITEMS-->".equals(line)){
+                if ("<!--ITEMS-->".equals(line)){
                     for (TodoItem todoItem:todoItemList) {
                         stringBuilder.append(todoItem.toHTMLCode());
                     }
@@ -49,20 +54,22 @@ public class Service {
         }catch(FileNotFoundException e){
             // return 500
             System.err.println("Couldn't find load the core HTML file todo.html: "+e);
+            return null;
         } catch (IOException e) {
             // return 500
             System.err.println("Couldn't generate HTML file: "+e);
-            html = "";
+            return null;
         }
         html = stringBuilder.toString();
         return html;
     }
 
-    public static String getHTMLFile(String url){
+
+    public static String getHTMLFile(String fileName){
         StringBuilder stringBuilder = new StringBuilder();
         String html = "";
         try{
-            FileReader fileReader = new FileReader("src/pages/todo.html");
+            FileReader fileReader = new FileReader("src/pages/"+ fileName);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine() ;
 
@@ -73,7 +80,7 @@ public class Service {
 
             bufferedReader.close();
         }catch(FileNotFoundException e){
-            System.out.println("File Not Found, POST a 404: "+e);
+            System.out.println("File Not Found, POST a 404: " + e);
             html = "";
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,4 +92,10 @@ public class Service {
         return html;
     }
 
+    public String handleDeleteFile(String param) {
+        return getHTMLFile("delete_success.html");
+    }
+    public String handlePutFile(String param) {
+        return getHTMLFile("put_success.html");
+    }
 }

@@ -2,6 +2,10 @@
 
 package http.server;
 
+import http.server.requests.HttpRequest;
+import http.server.response.HttpResponse;
+import http.server.response.HttpStatusCode;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -53,13 +57,17 @@ public class WebServer {
 
         BufferedReader in = new BufferedReader(new InputStreamReader( remote.getInputStream()));
         BufferedOutputStream out = new BufferedOutputStream(remote.getOutputStream());
+        PrintWriter oldOut = new PrintWriter(remote.getOutputStream());
 
         // read the data sent. We basically ignore it,
         // stop reading once a blank line is hit. This
         // blank line signals the end of the client HTTP
         // headers.
         HttpRequest request = HttpRequest.readHttpRequest(in);
-        int status = 0;
+        HttpResponse response;
+        String url = null;
+        String str = ".";
+      int status = 0;
         switch (request.method) {
           case GET -> {
             // Handle get
@@ -68,35 +76,44 @@ public class WebServer {
             System.out.println("Status : " + status);
           }
           case POST -> {
-            // handle Post
+            response = service.handleAddTodoItem(request.body);
+            response.sendResponse(oldOut);
           }
           case DELETE -> {
+            // TODO add file upload support
             // Handle delete
+            if ("/".equals(request.params)) {
+              // no file is provided, bad request
+              response = HttpResponse.badRequestResponse();
+            } else {
+              response = new HttpResponse(HttpStatusCode.OK, service.handleDeleteFile(request.params));
+              response.sendResponse(oldOut);
+
+            }
+          }
+          case PUT -> {
+            // TODO add file upload support
+            // Handle delete
+            if ("/".equals(request.params)) {
+              // no file is provided, bad request
+              response = HttpResponse.badRequestResponse();
+            } else {
+              response = new HttpResponse(HttpStatusCode.CREATED, service.handlePutFile(request.params));
+              response.sendResponse(oldOut);
+            }
           }
           case HEAD -> {
-            status = handleHead(out, request.params);
+            // TODO needs to be implemented
+            response = HttpResponse.badRequestResponse();// handleHead(out, request.params);
+            response.sendResponse(oldOut);
           }
           default -> {
+            // Bad request
+            response = HttpResponse.badRequestResponse();
+            response.sendResponse(oldOut);
           }
-          // Bad request
         }
 
-
-
-        // Send the response
-        //  out.println("HTTP/1.0 200 OK");
-        // Send the headers
-        /*
-        out.println("Content-Type: text/html");
-        out.println("Server: Bot");
-        */
-        // this blank line signals the end of the headers
-        //out.println("");
-
-        // Send the HTML page
-        // out.println(bodyResponse);
-        //bodyResponse = "";
-        out.flush();
         remote.close();
       } catch (Exception e) {
         System.out.println("Error: " + e);
