@@ -9,3 +9,7 @@
     animation: alternate;
     animation-duration: .5s;
 }
+.green-text{
+    font-weight: bold;
+    color: darkgreen;
+}
