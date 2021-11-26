@@ -74,6 +74,7 @@ public class WebServer {
             System.out.println("Parameters:" + request.params);
             status = handleGet(out, request.params);
             System.out.println("Status : " + status);
+            out.flush();
           }
           case POST -> {
             response = service.handleAddTodoItem(request.body);
@@ -114,7 +115,6 @@ public class WebServer {
         }
 
         // After writing on the OutputStream on the required handler, we flush the OutputStream
-        out.flush();
         System.out.println();
         remote.close();
       } catch (Exception e) {

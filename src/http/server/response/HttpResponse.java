@@ -64,9 +64,9 @@ public class HttpResponse<T> {
             System.out.println((rn));
             // this blank line signals the end of the headers
             out.write(("").getBytes(StandardCharsets.UTF_8));
-            out.write(("HTTP/1.1 " + this.statusCode).getBytes(StandardCharsets.UTF_8));
-            out.write(("Content-Type:" + contentType).getBytes(StandardCharsets.UTF_8));
-            out.write(("Server: Bot").getBytes(StandardCharsets.UTF_8));
+            out.write(("HTTP/1.1 " + this.statusCode + "\n").getBytes(StandardCharsets.UTF_8));
+            out.write(("Content-Type:" + contentType + "\n").getBytes(StandardCharsets.UTF_8));
+            out.write(("Server: Bot" + "\n").getBytes(StandardCharsets.UTF_8));
             out.write((rn).getBytes(StandardCharsets.UTF_8));
             // this blank line signals the end of the headers
         } catch(IOException e){
@@ -88,7 +88,7 @@ public class HttpResponse<T> {
                 out.write((byte[]) body);
                 System.out.println((String)body);
             }
-            out.write("\r\n".getBytes(StandardCharsets.UTF_8));
+//            out.write("\r\n".getBytes(StandardCharsets.UTF_8));
             System.out.println("\r\n");
         }catch(IOException e){
             System.err.println("Error in HttpResponse " + e);
