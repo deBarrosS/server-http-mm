@@ -1,5 +1,6 @@
 package http.server;
 
+import http.server.requests.HttpRequest;
 import http.server.response.HttpResponse;
 import http.server.response.HttpStatusCode;
 
@@ -11,12 +12,15 @@ import java.util.Locale;
 import java.util.Map;
 
 public class Service {
-    private List<TodoItem> todoItemList = new LinkedList<>();
+    private final List<TodoItem> todoItemList = new LinkedList<>();
     private int latestId = 0;
     private final String NEW_ITEM_KEY = "new-item";
 
 
     public HttpResponse handleAddTodoItem(Map<String, String> body) {
+        if(body.containsKey(NEW_ITEM_KEY)){
+            return HttpResponse.badRequestResponse();
+        }
         TodoItem newItem = new TodoItem(latestId++, body.get(NEW_ITEM_KEY));
         todoItemList.add(newItem);
         String html =generateTodoHTML();
@@ -95,7 +99,21 @@ public class Service {
     public String handleDeleteFile(String param) {
         return getHTMLFile("delete_success.html");
     }
-    public String handlePutFile(String param) {
-        return getHTMLFile("put_success.html");
+    public HttpResponse handlePutFile(HttpRequest request) {
+        try{
+
+            OutputStream out = new FileOutputStream("a.jpg");
+            // NEED TO CHANGE THIS
+            out.write(request.body.toString().getBytes());
+            out.flush();
+            out.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("Could not create or find file: "+e);
+            return HttpResponse.internalServerErrorResponse();
+        } catch (Exception e){
+            System.err.println("Error in handlePutFile: "+e);
+            return HttpResponse.internalServerErrorResponse();
+        }
+        return new HttpResponse(HttpStatusCode.OK, "text/html", getHTMLFile("put_success.html"));
     }
 }
