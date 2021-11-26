@@ -17,6 +17,11 @@ public class Service {
     private final String NEW_ITEM_KEY = "new-item";
 
 
+    /**
+     * Handles the HTTP POST request
+     * @param body Map containing the body of the request.
+     * @return corresponding HttpResponse
+     */
     public HttpResponse handleAddTodoItem(Map<String, String> body) {
         if(!body.containsKey(NEW_ITEM_KEY)){
             return HttpResponse.badRequestResponse();
@@ -68,7 +73,11 @@ public class Service {
         return html;
     }
 
-
+    /**
+     *  Returns a String containing the HTML content of the File identified by the filename
+     * @param fileName String identifying the researched File
+     * @return String containing the HTML content of the File identified by the filename
+     */
     public static String getHTMLFile(String fileName){
         StringBuilder stringBuilder = new StringBuilder();
         String html = "";
@@ -96,6 +105,11 @@ public class Service {
         return html;
     }
 
+    /**
+     * Handles the Delete HTTP Request
+     * @param request HttpRequest
+     * @return Corrsponding HttpResponse
+     */
     public HttpResponse handleDeleteFile(HttpRequest request) {
         String fileDir = request.params;
         File file = new File("uploads/" + fileDir);
@@ -106,6 +120,11 @@ public class Service {
         System.out.println("File "+ fileDir + " deleted successfully");
         return new HttpResponse(HttpStatusCode.OK, "text/html", getHTMLFile("delete_success.html"));
     }
+    /**
+     * Handles the Put HTTP Request
+     * @param request HttpRequest
+     * @return Corrsponding HttpResponse
+     */
     public HttpResponse handlePutFile(HttpRequest request) {
         try{
             /* For files

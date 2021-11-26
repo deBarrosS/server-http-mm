@@ -4,10 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Todo</title>
+    <link rel="stylesheet" type="text/css" href="/pages/style.min.css"/>
+    <script src="/pages/js/time.js"></script>
 </head>
 
 <body>
-    <h1>To-do List</h1>
+    <h1>Server GET test</h1>
+    <div>
+        If <span class="green-text"> this is green</span>, the stylesheet has been successfully loaded from the server.
+    </div>
+    <button onclick="showtime()">Show Date </button>
+
+    <div id="time">
+        <div id="inner-time-div">
+
+        </div>
+    </div>
+    </br>
+
+    <h1>Server POST test</h1>
+    <h2>To-do List</h2>
     <div id="items">
 <!--ITEMS-->
     </div>
@@ -18,6 +34,14 @@
         </p>
     </form>
 
+    <h1>Server PUT/DELETE test</h1>
+
+    <form method="POST">
+        <p>
+            Add element: <input type="text" size="10" maxlength="250" name="new-item" />
+            <button>Add</button>
+        </p>
+    </form>
 </body>
 
 </html>

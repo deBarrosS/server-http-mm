@@ -5,6 +5,7 @@ import http.server.requests.HttpMethods;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +32,11 @@ public class HttpRequest {
         }
     }
 
+    /**
+     * Parses an Http request sent to the BufferedInputStream attached to the socket
+     * @param in  BufferedInputStream attached to the socket
+     * @return HttpRequest created accordingly to the information received
+     */
     public static HttpRequest readHttpRequest(BufferedInputStream in){
         HttpRequest request = null;
         try {
@@ -91,7 +97,25 @@ public class HttpRequest {
         return request;
     }
 
+    /**
+     *  Returns whether index is lower than the length of the lines in parameter
+     * @param index int
+     * @param lines String[]
+     * @return index < lines.length
+     */
     private static boolean indexInBounds(int index, String[] lines) {
         return index < lines.length;
+    }
+
+    @Override
+    public String toString() {
+        return "HttpRequest{" +
+                "method=" + method +
+                ", params='" + params + '\'' +
+                ", contentType='" + contentType + '\'' +
+                ", accepts=" + Arrays.toString(accepts) +
+                ", body=" + body +
+                ", contentLength=" + contentLength +
+                '}';
     }
 }
