@@ -13,13 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 /**
- * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
- * Java Copyright 2001 by Jeff Heaton
- * 
- * WebServer is a very simple web-server. Any request is responded with a very
- * simple web-page.
- * 
- * @author Jeff Heaton
+ *
+ * WebServer is a simple web-server that handles HTTP GET, POST, PUT, HEAD and DELETE methods.
+ * @author Matheus de Barros Silva, Matthieu Roux
  * @version 1.0
  */
 public class WebServer {
@@ -87,25 +83,24 @@ public class WebServer {
               // no file is provided, bad request
               response = HttpResponse.badRequestResponse();
             } else {
-              response = new HttpResponse(HttpStatusCode.OK, service.handleDeleteFile(request.params));
+              response = service.handleDeleteFile(request);
               response.sendResponse(out);
 
             }
           }
           case PUT -> {
-            // TODO add file upload support
+
             if ("/".equals(request.params)) {
               // no file is provided, bad request
               response = HttpResponse.badRequestResponse();
             } else {
-              response = new HttpResponse(HttpStatusCode.CREATED, service.handlePutFile(request.params));
+              response = service.handlePutFile(request);
               response.sendResponse(out);
             }
           }
           case HEAD -> {
-            // TODO needs to be implemented
-            response = HttpResponse.badRequestResponse();// handleHead(out, request.params);
-            response.sendResponse(out);
+            handleHead(out, request.params);
+            out.flush();
           }
           default -> {
             // Bad request
@@ -123,7 +118,13 @@ public class WebServer {
     }
   }
 
-
+  /**
+   * Handles the GET request
+   *
+   * @param out BufferedOutputStream attached to the connected socket
+   * @param filename String showing the name of the researched file
+   * @return status code of the http request
+   */
   public int handleGet(BufferedOutputStream out, String filename){
     filename = treatFilename(filename);
 
@@ -154,6 +155,13 @@ public class WebServer {
     return Integer.parseInt(status.split(" ")[0]);
   }
 
+  /**
+   *  Fetches the file located in the authorized file directory
+   *
+   * @param filename String showing the name of the researched file
+   * @param out BufferedOutputStream attached to the connected socket
+   * @return File searched file
+   */
   private File fetchFile(String filename, BufferedOutputStream out){
     String extension = filename.substring(filename.lastIndexOf('.')).toLowerCase(Locale.ROOT);
     String status = "200 OK";
@@ -177,6 +185,11 @@ public class WebServer {
     return file;
   }
 
+  /**
+   *  Simplifies and unifies the resource identifying.
+   * @param filename String identifying the researched resource
+   * @return String
+   */
   private String treatFilename(String filename){
     String treated = filename.substring(1);
     if (treated.endsWith("/")) {
@@ -185,6 +198,12 @@ public class WebServer {
     return treated;
   }
 
+  /**
+   *  Handles HEAD request
+   * @param out BufferedOutputStream attached to the connected socket
+   * @param filename String showing the name of the researched file
+   * @return int status code
+   */
   public int handleHead(BufferedOutputStream out, String filename) {
     filename = treatFilename(filename);
 
@@ -205,6 +224,13 @@ public class WebServer {
     return 404;
   }
 
+  /**
+   *  Returns the equivalent Headers taking into account the paramenters
+   * @param status statusCode and statusText
+   * @param extension extension of the corresponding file
+   * @param fileLength length of the corresponding file
+   * @return Headers
+   */
   public String responseHeader(String status, String extension, long fileLength){
     String rn = "\r\n";
     StringBuilder headerBuilder = new StringBuilder();

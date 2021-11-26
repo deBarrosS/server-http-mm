@@ -1,5 +1,6 @@
 package http.server;
 
+import http.server.requests.HttpRequest;
 import http.server.response.HttpResponse;
 import http.server.response.HttpStatusCode;
 
@@ -11,12 +12,20 @@ import java.util.Locale;
 import java.util.Map;
 
 public class Service {
-    private List<TodoItem> todoItemList = new LinkedList<>();
+    private final List<TodoItem> todoItemList = new LinkedList<>();
     private int latestId = 0;
     private final String NEW_ITEM_KEY = "new-item";
 
 
+    /**
+     * Handles the HTTP POST request
+     * @param body Map containing the body of the request.
+     * @return corresponding HttpResponse
+     */
     public HttpResponse handleAddTodoItem(Map<String, String> body) {
+        if(!body.containsKey(NEW_ITEM_KEY)){
+            return HttpResponse.badRequestResponse();
+        }
         TodoItem newItem = new TodoItem(latestId++, body.get(NEW_ITEM_KEY));
         todoItemList.add(newItem);
         String html =generateTodoHTML();
@@ -64,7 +73,11 @@ public class Service {
         return html;
     }
 
-
+    /**
+     *  Returns a String containing the HTML content of the File identified by the filename
+     * @param fileName String identifying the researched File
+     * @return String containing the HTML content of the File identified by the filename
+     */
     public static String getHTMLFile(String fileName){
         StringBuilder stringBuilder = new StringBuilder();
         String html = "";
@@ -92,10 +105,46 @@ public class Service {
         return html;
     }
 
-    public String handleDeleteFile(String param) {
-        return getHTMLFile("delete_success.html");
+    /**
+     * Handles the Delete HTTP Request
+     * @param request HttpRequest
+     * @return Corrsponding HttpResponse
+     */
+    public HttpResponse handleDeleteFile(HttpRequest request) {
+        String fileDir = request.params;
+        File file = new File("uploads/" + fileDir);
+        if(!file.delete()) {
+            System.out.println("Failed to delete the file");
+            return HttpResponse.internalServerErrorResponse();
+        }
+        System.out.println("File "+ fileDir + " deleted successfully");
+        return new HttpResponse(HttpStatusCode.OK, "text/html", getHTMLFile("delete_success.html"));
     }
-    public String handlePutFile(String param) {
-        return getHTMLFile("put_success.html");
+    /**
+     * Handles the Put HTTP Request
+     * @param request HttpRequest
+     * @return Corrsponding HttpResponse
+     */
+    public HttpResponse handlePutFile(HttpRequest request) {
+        try{
+            /* For files
+            OutputStream out = new FileOutputStream("a.jpg");
+            // NEED TO CHANGE THIS
+            out.write(request.body.toString().getBytes());
+            out.flush();
+            out.close();
+             */
+            PrintWriter out = new PrintWriter("uploads/"+ request.params);            // NEED TO CHANGE THIS
+            out.println(request.body.get("content"));
+            out.flush();
+            out.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("Could not create or find file: "+e);
+            return HttpResponse.internalServerErrorResponse();
+        } catch (Exception e){
+            System.err.println("Error in handlePutFile: "+e);
+            return HttpResponse.internalServerErrorResponse();
+        }
+        return new HttpResponse(HttpStatusCode.CREATED, "text/html", getHTMLFile("put_success.html"));
     }
 }

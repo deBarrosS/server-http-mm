@@ -27,25 +27,10 @@ public class HttpResponse<T> {
         }
     }
 
-    // OLD
     public HttpResponse(HttpStatusCode statusCode, T body) {
         this.statusCode = statusCode;
         this.body = body;
         this.contentType = "text/html";
-    }
-
-    /**
-     * sendHeader will send the header of the response on the PrintWriter out
-      * but not flush it.
-      * @param out the PrintWriter used to send the body
-     */
-    public void sendHeader(PrintWriter out){
-        // Send the headers
-        out.println("HTTP/1.0 " + this.statusCode);
-        out.println("Content-Type: " + contentType);
-        out.println("Server: Bot");
-        // this blank line signals the end of the headers
-        out.println("");
     }
 
     /**
@@ -114,10 +99,17 @@ public class HttpResponse<T> {
 
     }
 
+    /**
+     *  Returns an HttpResponse having the Bad Request status code
+     * @return HttpResponse having the Bad Request status code
+     */
     public static HttpResponse badRequestResponse(){
         return new HttpResponse(HttpStatusCode.BAD_REQUEST, Service.getHTMLFile("400.html"));
     }
-
+    /**
+     * Returns an HttpResponse having the Internal Server Error status code
+     * @return HttpResponse having the Internal Server Error status code
+     */
     public static HttpResponse internalServerErrorResponse(){
         return new HttpResponse(HttpStatusCode.INTERNAL_SERVER_ERROR, Service.getHTMLFile("500.html"));
     }
