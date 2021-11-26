@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static http.server.requests.HttpMethods.POST;
+import static http.server.requests.HttpMethods.PUT;
 
 
 public class HttpRequest {
@@ -69,14 +70,14 @@ public class HttpRequest {
             }
 
             // Get request body
-            if (request.method == POST) {
+            if (request.method == POST || request.method == PUT) {
                 str = lines[index++];
                 //  load body
                 request.body = new HashMap<>();
                 while (str != null && !str.equals("")) {
                     String[] strSplit = str.split("=");
                     if(strSplit.length > 1){
-                        request.body.put(strSplit[0], strSplit[1]);
+                        request.body.put(strSplit[0], strSplit[1].replaceAll("\\u0000", ""));
                     } else {
                         request.body.put(strSplit[0], "");
                     }

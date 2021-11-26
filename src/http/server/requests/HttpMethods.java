@@ -18,6 +18,8 @@ public enum HttpMethods {
             return POST;
         } else if(DELETE.toString().equals(str)){
             return DELETE;
+        } else if(PUT.toString().equals(str)){
+            return PUT;
         }else if(HEAD.toString().equals(str)){
             return HEAD;
         }

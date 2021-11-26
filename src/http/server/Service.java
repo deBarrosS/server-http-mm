@@ -101,10 +101,15 @@ public class Service {
     }
     public HttpResponse handlePutFile(HttpRequest request) {
         try{
-
+            /* For files
             OutputStream out = new FileOutputStream("a.jpg");
             // NEED TO CHANGE THIS
             out.write(request.body.toString().getBytes());
+            out.flush();
+            out.close();
+             */
+            PrintWriter out = new PrintWriter("uploads/temp.txt");            // NEED TO CHANGE THIS
+            out.println(request.body.get("content"));
             out.flush();
             out.close();
         } catch (FileNotFoundException e) {
