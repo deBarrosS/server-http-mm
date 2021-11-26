@@ -18,7 +18,7 @@ public class Service {
 
 
     public HttpResponse handleAddTodoItem(Map<String, String> body) {
-        if(body.containsKey(NEW_ITEM_KEY)){
+        if(!body.containsKey(NEW_ITEM_KEY)){
             return HttpResponse.badRequestResponse();
         }
         TodoItem newItem = new TodoItem(latestId++, body.get(NEW_ITEM_KEY));
@@ -96,8 +96,15 @@ public class Service {
         return html;
     }
 
-    public String handleDeleteFile(String param) {
-        return getHTMLFile("delete_success.html");
+    public HttpResponse handleDeleteFile(HttpRequest request) {
+        String fileDir = request.params;
+        File file = new File("uploads/" + fileDir);
+        if(!file.delete()) {
+            System.out.println("Failed to delete the file");
+            return HttpResponse.internalServerErrorResponse();
+        }
+        System.out.println("File "+ fileDir + " deleted successfully");
+        return new HttpResponse(HttpStatusCode.OK, "text/html", getHTMLFile("delete_success.html"));
     }
     public HttpResponse handlePutFile(HttpRequest request) {
         try{
@@ -108,7 +115,7 @@ public class Service {
             out.flush();
             out.close();
              */
-            PrintWriter out = new PrintWriter("uploads/temp.txt");            // NEED TO CHANGE THIS
+            PrintWriter out = new PrintWriter("uploads/"+ request.params);            // NEED TO CHANGE THIS
             out.println(request.body.get("content"));
             out.flush();
             out.close();
@@ -119,6 +126,6 @@ public class Service {
             System.err.println("Error in handlePutFile: "+e);
             return HttpResponse.internalServerErrorResponse();
         }
-        return new HttpResponse(HttpStatusCode.OK, "text/html", getHTMLFile("put_success.html"));
+        return new HttpResponse(HttpStatusCode.CREATED, "text/html", getHTMLFile("put_success.html"));
     }
 }

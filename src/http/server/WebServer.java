@@ -87,7 +87,7 @@ public class WebServer {
               // no file is provided, bad request
               response = HttpResponse.badRequestResponse();
             } else {
-              response = new HttpResponse(HttpStatusCode.OK, service.handleDeleteFile(request.params));
+              response = service.handleDeleteFile(request);
               response.sendResponse(out);
 
             }
