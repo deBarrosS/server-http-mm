@@ -4,20 +4,34 @@
     <meta charset="UTF-8">
     <title>Index</title>
     <link rel="stylesheet" type="text/css" href="pages/style.min.css"/>
-    <script src="pages/js/adder.js"></script>
+    <script src="pages/js/time.js"></script>
 </head>
+
 <body>
     <h1>Server methods test</h1>
     <div>
         If <span class="green-text"> this is green</span>, the stylesheet has been successfully loaded from the server.
     </div>
+    <button onclick="showtime()">Show Date </button>
+
+    <div id="time">
+        <div id="inner-time-div">
+
+        </div>
+    </div>
+
     <div>
-        TODO : INSERT DYNAMIC TESTING USING INPUTS AND JS
+        <form method="post">
+            <label for="fname">First name:</label>
+            <input type="text" id="fname" name="fname"><br><br>
+            <label for="lname">Last name:</label>
+            <input type="text" id="lname" name="lname"><br><br>
+            <input type="submit" value="Submit">
+        </form>
 
         <input id="a-input" type="number" > + <input id="b-input" type="number" >  <button id ="btn-equal" onclick="addinputs"> = </button>  <p id="c-field"> </p>
 
     </div>
-
 
 </body>
 </html>

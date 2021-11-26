@@ -2,18 +2,33 @@ package http.server.response;
 
 import http.server.Service;
 
-import java.io.BufferedOutputStream;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.Buffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * HttpResponse is used to create and send Http responses easily.
  */
-public class HttpResponse {
+public class HttpResponse<T> {
     public HttpStatusCode statusCode;
-    public String body;
     public String contentType;
+    public T body;
+    public long contentLength;
 
-    public HttpResponse(HttpStatusCode statusCode, String body) {
+
+    public HttpResponse(HttpStatusCode statusCode,String contentType, T body) {
+        this.statusCode = statusCode;
+        this.body = body;
+        this.contentType = contentType;
+        if(body instanceof String){
+            this.contentLength = (((String) body).getBytes()).length;
+        }else if(body instanceof byte[]){
+            this.contentLength = ((byte[]) body).length;
+        }
+    }
+
+    // OLD
+    public HttpResponse(HttpStatusCode statusCode, T body) {
         this.statusCode = statusCode;
         this.body = body;
         this.contentType = "text/html";
@@ -34,13 +49,50 @@ public class HttpResponse {
     }
 
     /**
-     * sendBody will send the body of the response on the PrintWriter out
+     * writeHeader will write the header of the response on the BufferedOutputStream out
      * but not flush it.
-     * @param out the PrintWriter used to send the body
+     * @param out the BufferedOutputStream attached to the open Socket
      */
-    public void sendBody(PrintWriter out){
-        // Send the HTML page or JSON File
-        out.println(this.body);
+    public void writeHeaders(BufferedOutputStream out){
+        // Write the headers
+        try{
+            String rn = "\r\n";
+            System.out.println(("HTTP/1.1 " + this.statusCode));
+            System.out.println(("Content-Length: " + contentLength));
+            System.out.println(("Content-Type: " + contentType));
+            System.out.println(("Server: Bot"));
+            System.out.println((rn));
+            // this blank line signals the end of the headers
+            out.write(("").getBytes(StandardCharsets.UTF_8));
+            out.write(("HTTP/1.1 " + this.statusCode).getBytes(StandardCharsets.UTF_8));
+            out.write(("Content-Type:" + contentType).getBytes(StandardCharsets.UTF_8));
+            out.write(("Server: Bot").getBytes(StandardCharsets.UTF_8));
+            out.write((rn).getBytes(StandardCharsets.UTF_8));
+            // this blank line signals the end of the headers
+        } catch(IOException e){
+            System.err.println(e);
+        }
+    }
+
+    /**
+     * writeBody will write the body of the response on the BufferedOutputStream out
+     * but not flush it.
+     * @param out the BufferedOutputStream attached to the open Socket
+     */
+    public void writeBody(BufferedOutputStream out){
+        try{
+            if (body instanceof String) {
+                out.write(((String)body).getBytes(StandardCharsets.UTF_8));
+                System.out.println((String)body);
+            } else if (body instanceof byte[]) {
+                out.write((byte[]) body);
+                System.out.println((String)body);
+            }
+            out.write("\r\n".getBytes(StandardCharsets.UTF_8));
+            System.out.println("\r\n");
+        }catch(IOException e){
+            System.err.println("Error in HttpResponse " + e);
+        }
     }
 
     /**
@@ -48,13 +100,18 @@ public class HttpResponse {
      * Please be awater that it will flush the PrintWriter
      * @param out he PrintWriter used to send the response
      */
-    public void sendResponse(PrintWriter out){
+    public void sendResponse(BufferedOutputStream out){
         // TODO Buffered output support
-        sendHeader(out);
-        if (body != null) {
-            sendBody(out);
+        try{
+            writeHeaders(out);
+            if (body != null) {
+                writeBody(out);
+            }
+            out.flush();
+        }catch(Exception e) {
+            System.err.println("Error in HttpResponse " + e);
         }
-        out.flush();
+
     }
 
     public static HttpResponse badRequestResponse(){

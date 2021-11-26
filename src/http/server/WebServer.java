@@ -55,14 +55,14 @@ public class WebServer {
         // remote is now the connected socket
         System.out.println("Connection, sending data.");
 
-        BufferedReader in = new BufferedReader(new InputStreamReader( remote.getInputStream()));
+        BufferedInputStream in = new BufferedInputStream( remote.getInputStream());
         BufferedOutputStream out = new BufferedOutputStream(remote.getOutputStream());
-        PrintWriter oldOut = new PrintWriter(remote.getOutputStream());
 
         // read the data sent. We basically ignore it,
         // stop reading once a blank line is hit. This
         // blank line signals the end of the client HTTP
         // headers.
+
         HttpRequest request = HttpRequest.readHttpRequest(in);
         HttpResponse response;
         String url = null;
@@ -77,7 +77,7 @@ public class WebServer {
           }
           case POST -> {
             response = service.handleAddTodoItem(request.body);
-            response.sendResponse(oldOut);
+            response.sendResponse(out);
           }
           case DELETE -> {
             // TODO add file upload support
@@ -87,33 +87,35 @@ public class WebServer {
               response = HttpResponse.badRequestResponse();
             } else {
               response = new HttpResponse(HttpStatusCode.OK, service.handleDeleteFile(request.params));
-              response.sendResponse(oldOut);
+              response.sendResponse(out);
 
             }
           }
           case PUT -> {
             // TODO add file upload support
-            // Handle delete
             if ("/".equals(request.params)) {
               // no file is provided, bad request
               response = HttpResponse.badRequestResponse();
             } else {
               response = new HttpResponse(HttpStatusCode.CREATED, service.handlePutFile(request.params));
-              response.sendResponse(oldOut);
+              response.sendResponse(out);
             }
           }
           case HEAD -> {
             // TODO needs to be implemented
             response = HttpResponse.badRequestResponse();// handleHead(out, request.params);
-            response.sendResponse(oldOut);
+            response.sendResponse(out);
           }
           default -> {
             // Bad request
             response = HttpResponse.badRequestResponse();
-            response.sendResponse(oldOut);
+            response.sendResponse(out);
           }
         }
 
+        // After writing on the OutputStream on the required handler, we flush the OutputStream
+        out.flush();
+        System.out.println();
         remote.close();
       } catch (Exception e) {
         System.out.println("Error: " + e);
@@ -131,7 +133,6 @@ public class WebServer {
     System.out.println("accessPermited " + accessPermited);
     // Header still to receive status, length of the body and other headers
     try{
-
       File file = fetchFile(filename, out);
 
       // Read the file as binary allows same manipulation for every type of file
@@ -145,7 +146,7 @@ public class WebServer {
       }
 
       fileStream.close();
-      out.flush();
+
     }catch(Exception e){
       System.err.println("Error in Handle Get " + e);
     }
@@ -189,7 +190,6 @@ public class WebServer {
 
     boolean accessPermited = filename.startsWith(FILES_DIRECTORY);
     if(!accessPermited){
-
       return 403;
     }
     System.out.println("accessPermited " + accessPermited);

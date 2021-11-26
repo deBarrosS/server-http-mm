@@ -23,7 +23,7 @@ public class Service {
         if (html == null){
             return HttpResponse.internalServerErrorResponse();
         }
-        return new HttpResponse(HttpStatusCode.CREATED, html);
+        return new HttpResponse(HttpStatusCode.CREATED, "text/html", html);
     }
 
     /**
@@ -34,7 +34,7 @@ public class Service {
         StringBuilder stringBuilder = new StringBuilder();
         String html = "";
         try{
-            FileReader fileReader = new FileReader("src/pages/todo.html");
+            FileReader fileReader = new FileReader("pages/todo.html");
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine() ;
 
